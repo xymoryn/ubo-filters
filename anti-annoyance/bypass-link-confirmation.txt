@@ -1,0 +1,500 @@
+[uBlock Origin]
+! Title: Bypass Link Confirmation
+! Description: Bypass the confirmation box and intermediate page when opening external links.
+! Author: xymoryn
+! Version: 2025.04.17
+! Last modified: 2025-04-17
+! Homepage: https://github.com/xymoryn/uBO-filters
+! License: AGPL-3.0
+! Expires: 1 days
+! Source: https://github.com/OldPanda/Open-the-F-king-URL-Right-Now/blob/master/userscript.js
+! Source: https://github.com/sakura-flutter/tampermonkey-scripts/blob/gh-pages/redirect.js
+! Source: https://github.com/maomao1996/tampermonkey-scripts/blob/gh-pages/remove-redirect.user.js
+! Source: https://github.com/bjornstar/intercept-redirect/blob/master/webextension/index.js
+
+
+!-------------------------信息聚合-------------------------
+! 谷歌
+! https://www.google.com/search?q=firefox
+www.google.*##+js(href-sanitizer, a[href^="/url?"], ?url)
+! https://www.google.com/url?q=https://github.com
+||www.google.*/url?$urlskip=?q,doc,frame
+! https://www.google.com/url?q=&url=https://github.com
+||www.google.*/url?$urlskip=?url,doc,frame
+
+! 谷歌图片
+! https://www.google.com/search?q=GitHub&udm=2
+! 图片来源页面
+www.google.*##+js(href-sanitizer, a[href^="/imgres?"], ?imgrefurl)
+! 图片链接
+www.google.*##+js(href-sanitizer, a[href^="/imgres?"], ?imgurl)
+! https://www.google.com/imgres?q=GitHub&imgurl=https%3A%2F%2Favatars1.githubusercontent.com%2Fu%2F9919%3Fv%3D4&imgrefurl=https%3A%2F%2Fgithub.com%2Fabout&docid=49EzdUgEYND5cM&tbnid=ZCQO6cqAgRkgVM&vet=12ahUKEwjy6PDnlteMAxXsTGwGHSoSF2MQM3oECHEQAA..i&w=460&h=460&hcb=2&ved=2ahUKEwjy6PDnlteMAxXsTGwGHSoSF2MQM3oECHEQAA
+||www.google.*/imgres?$urlskip=?imgrefurl,doc,frame
+||www.google.*/imgres?$urlskip=?imgurl,doc,frame
+
+! 必应
+! https://www.bing.com/search?q=google
+! bing.com##+js(href-sanitizer, a[href*="bing.com/ck/a"], /[?&]u=a1(aHR0c[^&#]+)/ -base64 +https)
+! https://www.bing.com/ck/a?!&&ptn=3&ver=2&u=a1aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8&ntb=1
+||bing.com/ck/a*^u=a1aHR0c$doc,urlskip=/[?&]u=a1(aHR0c[^&#]+)/ -base64 +https
+
+! 今日头条
+! https://so.toutiao.com/search?dvpf=pc&keyword=GitHub
+so.toutiao.com##+js(href-sanitizer, a[href^="/search/jump?"], ?url)
+! https://so.toutiao.com/search/jump?url=https%3A%2F%2Fgithub.com
+||so.toutiao.com/search/jump?$urlskip=?url,doc,frame
+
+! 360搜索
+! https://www.so.com/s?q=github
+so.com##+js(href-sanitizer, a[data-mdurl], [data-mdurl])
+
+! https://m.so.com/s?q=github
+m.so.com##+js(href-sanitizer, a[href*="m.so.com/jump?"], ?u)
+! https://m.so.com/jump?u=http%3A%2F%2Fhelp.github.com
+||m.so.com/jump?$urlskip=?u,doc,frame
+
+
+! 爱达杂货铺
+! https://adzhp.cc
+adzhp.cc##+js(href-sanitizer, a[data-url], [data-url])
+adzhp.cc##+js(href-sanitizer, a[href*="adzhp.cc/go/?"], ?url -base64)
+! https://adzhp.cc/go/?url=aHR0cHM6Ly93ZXJlYWQucXEuY29tLw%3D%3D
+||adzhp.cc/go/?$urlskip=?url -base64,doc,frame
+
+! ACG盒子
+! https://www.acgbox.link
+acgbox.link##+js(href-sanitizer, a[data-url], [data-url])
+acgbox.link##+js(href-sanitizer, a[href*="acgbox.link/go/?"], ?url -base64)
+! https://www.acgbox.link/go/?url=aHR0cHM6Ly93d3cucGl4aXYubmV0Lw%3D%3D
+||acgbox.link/go/?$urlskip=?url -base64,doc,frame
+
+
+!-------------------------社交-------------------------
+! QQ/微信
+! https://c.pc.qq.com/middlem.html?pfurl=pixiv.net
+$urlskip=/(?:middleb|middlect|middlem|index)\.html\?pfurl=([^=]+)/ +https,doc,frame,domain=c.pc.qq.com
+$urlskip=/(?:pc|android|ios)\.html\?url=([^=]+)/ +https,doc,frame,domain=c.pc.qq.com
+
+! telegram
+! https://t.me/iv?url=https://github.com
+||t.me/iv?$urlskip=?url,doc,frame
+
+! Gmail
+mail.google.com##a[data-saferedirecturl]:watch-attr('data-saferedirecturl'):remove-attr('data-saferedirecturl')
+
+! Outlook
+! https://apc01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com
+||safelinks.protection.outlook.com/?$urlskip=?url,doc,frame
+! https://outlook.office.com/mail/safelink.html?url=
+||outlook.office.com/mail/safelink.html?$urlskip=?url,doc,frame
+
+! 新版 QQ邮箱
+wx.mail.qq.com##+js(aeld, click, "safeOpen", elements, a)
+! https://wx.mail.qq.com/xmspamcheck/xmsafejump?func=2&click_src=0&check_src=0&url=https%3A%2F%2Fgithub.com
+||wx.mail.qq.com/xmspamcheck/xmsafejump?$urlskip=?url,doc,frame
+
+! QQ邮箱
+! https://mail.qq.com/cgi-bin/readtemplate?t=safety&check=false&gourl=https://github.com/&subtemplate=gray&evil=0
+||mail.qq.com/cgi-bin/readtemplate?$urlskip=?gourl,doc,frame
+
+! QQ空间
+! https://www.urlshare.cn/umirror_url_check?_wv=&srctype=&apptype=&loginuin=&plateform=&url=https%3A%2F%2Fgithub.com
+||urlshare.cn/umirror_url_check?$urlskip=?url,doc,frame
+
+! Facebook
+! https://www.facebook.com/flx/warn/?u=https%3A%2F%2Fgithub.com
+||facebook.com/flx/warn/?$urlskip=?u,doc,frame
+! https://l.facebook.com/l.php?u=https%3A%2F%2Fgithub.com
+||facebook.com/l.php?$urlskip=?u,doc,frame
+! https://l.messenger.com/l.php?u=http%3A%2F%2Fgithub.com
+||messenger.com/l.php?$urlskip=?u,doc,frame
+
+! 企业微信
+! https://open.work.weixin.qq.com/wwopen/uriconfirm?err_type=domain_err&uri=https%3A%2F%2Fgithub.com
+||open.work.weixin.qq.com/wwopen/uriconfirm?$urlskip=?uri +https,doc,frame
+
+! Microsoft Teams
+! https://statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html?url=https%3A%2F%2Fpixiv.net
+||statics.teams.cdn.office.net/evergreen-assets/safelinks/1/atp-safelinks.html?$urlskip=?url,doc,frame
+
+
+!-------------------------内容-------------------------
+! Youtube
+! https://www.youtube.com/watch?v=XqfXJl9IUGg
+youtube.com##+js(href-sanitizer, a[href*="www.youtube.com/redirect?"], ?q)
+! https://www.youtube.com/redirect?q=https%3A%2F%2Fgithub.com
+||youtube.com/redirect?$urlskip=?q,doc,frame
+
+! Tiktok
+! https://www.tiktok.com/link/v2?aid=1988&lang=en&scene=bio_url&target=lmarena.ai
+||tiktok.com/link/v2?$urlskip=?target +https,doc,frame
+
+! 微博
+! https://www.weibo.com/1684197391/OB0RGuFpr
+weibo.com,weibo.cn##+js(href-sanitizer, a[href*="weibo.cn/sinaurl?"], ?u)
+weibo.com,weibo.cn##+js(href-sanitizer, a[href*="weibo.cn/sinaurl?"], ?toasturl)
+! https://weibo.cn/sinaurl?toasturl=https%3A%2F%2Fgithub.com
+||weibo.cn/sinaurl?$urlskip=?u,doc,frame
+||weibo.cn/sinaurl?$urlskip=?toasturl,doc,frame
+
+! VK
+! https://vk.com/bang_dream?w=club138252596
+vk.com,vk.ru##+js(href-sanitizer, a[href^="/go?to="][title], [title])
+vk.com,vk.ru##+js(href-sanitizer, a[href^="/away.php?"], ?to)
+! https://vk.com/away.php?to=https%3A%2F%2Fgithub.com
+||vk.com/away.php?$urlskip=?to,doc,frame
+||vk.ru/away.php?$urlskip=?to,doc,frame
+
+! Pixiv
+! https://www.pixiv.net/artworks/80230341
+pixiv.net##+js(href-sanitizer, a[href^="/jump.php?"])
+! https://www.pixiv.net/jump.php?https%3A%2F%2Fm.tb.cn%2Fh.VfU23Vb%3Fsm%3D406af8
+||pixiv.net/jump.php?$urlskip=&1,doc,frame
+! https://www.pixiv.net/users/33558705
+pixiv.net##+js(href-sanitizer, a[href^="/jump.php?"], ?url)
+! https://www.pixiv.net/jump.php?url=https%3A%2F%2Ftwitter.com%2FhuashiJW
+||pixiv.net/jump.php?$urlskip=?url,doc,frame
+
+! Instagram
+! https://www.instagram.com/github/
+instagram.com##+js(href-sanitizer, a[href*="instagram.com/?"], ?u)
+! https://l.instagram.com/?u=https%3A%2F%2Fgithub.com
+||instagram.com/?$urlskip=?u,doc,frame
+
+! Tumblr
+||t.umblr.com/redirect?$urlskip=?z,doc,frame
+
+! 知乎
+! https://zhuanlan.zhihu.com/p/48181379
+zhihu.com##+js(href-sanitizer, a[href*="link.zhihu.com"], ?target)
+! https://link.zhihu.com/?target=https%3A//getquicker.net/
+||link.zhihu.com/?$urlskip=?target,doc,frame
+
+! 少数派
+! https://sspai.com/post/84373
+sspai.com##+js(href-sanitizer, a[href*="sspai.com/link?"], ?target)
+! https://sspai.com/link?target=https%3A%2F%2Frime.im%2Fdownload%2F
+||sspai.com/link?$urlskip=?target,doc,frame
+
+! 机核
+! https://www.gcores.com/articles/191584
+gcores.com##+js(href-sanitizer, a[href*="gcores.com/link?"], ?target)
+! https://www.gcores.com/link?target=https%3A%2F%2Fgithub.com
+||gcores.com/link?$urlskip=?target,doc,frame
+
+! 花瓣
+! https://huaban.com/pins/5197170081
+huaban.com##+js(href-sanitizer, a[href^="/go?"], ?url +https)
+! https://huaban.com/go?pin_id=5197170081&url=github.com
+||huaban.com/go?$urlskip=?url +https,doc,frame
+
+! 优设网
+! https://www.uisdc.com/design-systems-at-github
+uisdc.com##+js(href-sanitizer, a[href*="link.uisdc.com?"], ?redirect)
+! https://link.uisdc.com?redirect=https%3A%2F%2Fstyleguide.github.com
+||link.uisdc.com?$urlskip=?redirect,doc,frame
+
+! 标志情报局
+! https://www.logonews.cn/san-diego-zoo-wildlife-alliance-new-logo.html
+logonews.cn##+js(href-sanitizer, a[href*="link.logonews.cn"], ?url)
+! https://link.logonews.cn/?url=https://sandiegozoowildlifealliance.org/
+||link.logonews.cn/?$urlskip=?url,doc,frame
+
+! 掘金
+! https://juejin.cn/post/7368421137917542438
+link.juejin.cn##+js(href-sanitizer, a[href*="link.juejin.cn/?"], ?target)
+! https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com
+||link.juejin.cn/?$urlskip=?target,doc,frame
+
+! 简书
+jianshu.com##+js(href-sanitizer, a[href*="links.jianshu.com/go?"], ?to)
+! https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com
+||links.jianshu.com/go?$urlskip=?to,doc,frame
+! https://www.jianshu.com/p/42a1ebd417d4
+jianshu.com##+js(href-sanitizer, a[href*="link.jianshu.com?"], ?t)
+! https://link.jianshu.com?t=https://firefox.com
+||link.jianshu.com?$urlskip=?t,doc,frame
+! https://www.jianshu.com/p/c2c5c9c5eaac
+jianshu.com##+js(href-sanitizer, a[href*="jianshu.com/go-wild?"], ?url)
+! https://www.jianshu.com/go-wild?ac=2&url=https%3A%2F%2Fgithub.com
+||jianshu.com/go-wild?$urlskip=?url,doc,frame
+
+! 思否
+! https://segmentfault.com/a/1190000008489710
+segmentfault.com##+js(href-sanitizer, a[href*="link.segmentfault.com/?"])
+
+! InfoQ
+! https://www.infoq.cn/article/0NQIEuUP0lcdmI2U2zE7
+infoq.cn##+js(aeld, click, , elements, .content-preview)
+! https://www.infoq.cn/link?target=https%3A%2F%2Fgithub.com
+||infoq.cn/link?$urlskip=?target,doc,frame
+! https://xie.infoq.cn/article/4bfec26b0a63aa5c1d083b8aa
+infoq.cn##+js(href-sanitizer, a[href*="infoq.cn/link?"], ?target)
+
+! 360文档
+360doc.cn,360doc.com##+js(aeld, click, "isTrut", elements, a)
+! https://www.360doc.com/outlink.html?url=https://github.com
+||360doc.cn/outlink.html?$urlskip=?url,doc,frame
+||360doc.com/outlink.html?$urlskip=?url,doc,frame
+
+
+!-------------------------社区-------------------------
+! 百度贴吧
+! https://tieba.baidu.com/p/7777322172
+tieba.baidu.com##+js(href-sanitizer, a.j-no-opener-url)
+! https://tieba.baidu.com/mo/q/checkurl?url=https%3A%2F%2Fgithub.com
+||tieba.baidu.com/mo/q/checkurl?$urlskip=?url,doc,frame
+! http://jump2.bdimg.com/safecheck/index?url=rN3wPs8te/r8jfr8YhogjfUWFoMgIRa8+7EqTQL1xDCHFoW3JdeJ7VdFsDwnMYaZBczd7RKUlPvRu8MwYmLLyPT1ri9Kqu7FOGsBWIozufJ2Pah4egTNMg==
+jump2.bdimg.com##+js(trusted-click-element, 'a.btn-next')
+
+! NGA
+! https://nga.178.com/read.php?tid=40405269
+nga.178.com,bbs.nga.cn,ngabbs.com,g.nga.cn##a.urlincontent:watch-attr(onclick):remove-attr(onclick)
+
+! 5ch
+! https://egg.5ch.net/test/read.cgi/software/1685203999/11-n?v=pc
+pixiv.net##+js(href-sanitizer, a[href*="jump.5ch.net/jump.php?"])
+! https://jump.5ch.net/?https://github.com
+||jump.5ch.net/jump.php?$urlskip=&1,doc,frame
+
+! 巴哈姆特
+! https://home.gamer.com.tw/creationDetail.php?sn=5245245
+gamer.com.tw##+js(href-sanitizer, a[href*="ref.gamer.com.tw/redir.php?"], ?url)
+! https://ref.gamer.com.tw/redir.php?url=https%3A%2F%2Fgithub.com
+||ref.gamer.com.tw/redir.php?$urlskip=?url,doc,frame
+
+! Anime字幕论坛
+! https://bbs.acgrip.com
+bbs.acgrip.com,404.website##+js(aeld, click, "jumpToExternalLink", elements, a)
+
+! 链滴
+! https://ld246.com/article/1704700687067
+ld246.com##+js(href-sanitizer, a[href*="link.ld246.com"], ?goto)
+! https://link.ld246.com/forward?goto=https%3A%2F%2Fgithub.com
+||link.ld246.com/forward?$urlskip=?goto,doc,frame
+
+! 豆瓣
+! https://www.douban.com/group/460530/
+douban.com##+js(href-sanitizer, a[href*="douban.com/link2/?"], ?url)
+! https://www.douban.com/link2/?url=https%3A%2F%2Fgithub.com
+||douban.com/link2/?$urlskip=?url,doc,frame
+
+! NodeSeek
+! https://www.nodeseek.com/post-230345-1
+nodeseek.com##+js(href-sanitizer, a[href^="/jump?"], ?to)
+! https://www.nodeseek.com/jump?to=https%3A%2F%2Fgithub.com
+||www.nodeseek.com/jump?$urlskip=?to,doc,frame
+
+
+
+!-------------------------工具-------------------------
+! 爱发电
+! https://afdian.com/a/music-tag-web
+afdian.com,ifdian.net##+js(href-sanitizer, a[href*="afdian.com/link?"], ?target)
+! https://afdian.com/link?target=https%3A%2F%2Fgithub.com
+||afdian.com/link?$urlskip=?target,doc,frame
+! https://ifdian.net/link?target=https%3A%2F%2Fgithub.com
+||ifdian.net/link?$urlskip=?target,doc,frame
+
+! 腾讯兔小巢
+! https://txc.qq.com/products/614512
+support.qq.com,txc.qq.com##+js(href-sanitizer, a[href*="/link-jump?"], ?jump)
+! https://txc.qq.com/products/614512/link-jump?jump=https%3A%2F%2Fpixpinapp.com%2F
+||support.qq.com/*/link-jump?$urlskip=?jump,doc,frame
+||txc.qq.com/*/link-jump?$urlskip=?jump,doc,frame
+
+! Gitee
+! https://gitee.com/LinkChou/sdsmu_welcome_tex
+gitee.com##+js(href-sanitizer, a[href*="link?"], ?target)
+! https://gitee.com/link?target=https%3A%2F%2Fgithub.com
+||gitee.com/link?$urlskip=?target,doc,frame
+
+! 印象笔记
+! https://app.yinxiang.com/OutboundRedirect.action?dest=https%3A%2F%2Fgithub.com
+||app.yinxiang.com/OutboundRedirect.action?$urlskip=?dest
+! https://www.evernote.com/OutboundRedirect.action?dest=https%3A%2F%2Fgithub.com
+||evernote.com/OutboundRedirect.action?$urlskip=?dest
+
+! 语雀
+! https://www.yuque.com/r/goto?url=https://github.com
+||www.yuque.com/r/goto?$urlskip=?url,doc,frame
+
+! Pocket
+! https://getpocket.com/redirect?url=https%3A%2F%2Fgithub.com
+||getpocket.com/redirect?$urlskip=?url,doc,frame
+
+! 谷歌文档
+! https://docs.google.com/spreadsheets/u/0/d/1TFcEXMcKrwoIAECIVyBU0GPoSmRqZ7A0VBvqeKYVSww/htmlview
+docs.google.com##+js(href-sanitizer, a[href*="google.com/url?"], ?to)
+
+! 飞书文档
+! https://vxc3hj17dym.feishu.cn/wiki/PwD9wYioeiVtXak8rItcwp3Fnlg
+feishu.cn##+js(aeld, click, "clickLinkImpl", elements, a)
+! https://security.feishu.cn/link/safety?target=https%3A%2F%2Fbaoyu.io%2F&scene=ccm&logParams=%7B%22location%22%3A%22ccm_docs%22%7D&lang=zh-CN
+||security.feishu.cn/link/safety?$urlskip=?target,doc,frame
+
+! 金山文档
+! https://www.kdocs.cn/office/link?target=https%3A%2F%2Fgithub.com
+||https://www.kdocs.cn/office/link?$urlskip=?target,doc,frame
+
+! 腾讯文档
+! https://docs.qq.com/scenario/link.html?url=https%3A%2F%2Fgithub.com
+||docs.qq.com/scenario/link.html?$urlskip=?url,doc,frame
+
+! 石墨文档
+! https://shimo.im/outlink/gray?url=https%3A%2F%2Fgithub.com
+||shimo.im/outlink/gray?$urlskip=?url,doc,frame
+! https://shimo.im/outlink/black?url=https%3A%2F%2Fgithub.com
+||shimo.im/outlink/black?$urlskip=?url,doc,frame
+! Firefox附加组件
+! https://addons.mozilla.org/firefox/addon/ublock-origin/
+addons.mozilla.org##+js(href-sanitizer, a[href*="prod.outgoing.prod.webservices.mozgcp.net"])
+! https://prod.outgoing.prod.webservices.mozgcp.net/v1/de148deb19b52874eb4c5726859834f3294a6057ed44e873c958acee4c920062/https%3A//github.com/gorhill/uBlock/releases
+||prod.outgoing.prod.webservices.mozgcp.net$urlskip=/(https?%3A\/\/.+$)/ -uricomponent,doc,frame
+
+! 酷安
+! https://www.coolapk.com/link?url=https%3A%2F%2Fgithub.com
+||www.coolapk.com/link?$urlskip=?url,doc,frame
+
+! HelloGitHub
+! https://hellogithub.com/periodical/statistics/click?target=https%3A%2F%2Fgithub.com
+||hellogithub.com/periodical/statistics/click?$urlskip=?target,doc,frame
+
+! 423Down
+! https://www.423down.com/1673.html
+423down.com##+js(href-sanitizer, a[href^="/go.php?url="], ?url -base64)
+! https://www.423down.com/go.php?url=aHR0cHM6Ly9naXRodWIuY29tL3p1ZnVsaXUvbm90ZXBhZDQvcmVsZWFzZXM=
+||423down.com/go.php?$urlskip=?url -base64,doc,frame
+
+! 绿软小站
+! https://www.gndown.com/499.html
+gndown.com##+js(href-sanitizer, a[href*="/target/")
+! https://www.gndown.com/target/aHR0cHM6Ly9nbmRvd24ubGFuem91Yi5jb20vYjA0OG9yeHpj
+||gndown.com/target/$urlskip=/target\/([^\/]+)/ -base64,doc,frame
+
+! 异次元软件
+! https://www.iplaysoft.com/link/?url=Hc0RHat9yL6M3ch52buU2YhBHa0l2Z4VmbiV2bj5Cd0V3Pv03bz9Vb9U2YyVXYsBXa0Z2bzlSbvNmLyNXboZGbwlWPm92c5F2bj5Cd0
+iplaysoft.com##+js(href-sanitizer, a[href^="https://urlsec.qq.com/check.html?", ?url)
+iplaysoft.com##+js(trusted-click-element, '#targetUrl + p + a.button')
+
+! 天眼查
+! https://www.tianyancha.com/company/150041670
+tianyancha.com##+js(href-sanitizer, a[href*="tianyancha.com/security?"], ?target)
+! https://www.tianyancha.com/security?target=https://github.com
+||tianyancha.com/security?$urlskip=?target,doc,frame
+
+! 企查查
+! https://www.qcc.com/cpartner/181e23a3c35a6fc18450f03cc13bb03b
+qcc.com##+js(href-sanitizer, a[href*="qcc.com/web/transfer-link?"], ?link)
+! https://www.qcc.com/web/transfer-link?link=https%3A%2F%2Fgithub.com
+||www.qcc.com/web/transfer-link?$urlskip=?link,doc,frame
+
+! 爱企查
+! https://aiqicha.baidu.com/company_detail_31610236813812
+aiqicha.baidu.com##+js(aeld, click, , elements, a.website)
+! https://aiqicha.baidu.com/safetip?target=https://github.com/
+||aiqicha.baidu.com/safetip?$urlskip=?target,doc,frame
+
+
+!-------------------------知识-------------------------
+! bilibili游戏 wiki
+! https://wiki.biligame.com/wiki/%E5%B8%AE%E5%8A%A9:CSS%E6%95%99%E7%A8%8B
+biligame.com##+js(href-sanitizer, a.external, ?url)
+! https://game.bilibili.com/linkfilter/?url=https%3A%2F%2Fgithub.com
+||game.bilibili.com/linkfilter/?$urlskip=?url,doc,frame
+
+! 快懂百科
+! https://www.baike.com/wikiid/7239981009876418592?source=search&anchor=reference_list_title
+baike.com##+js(href-sanitizer, a[href^="/redirect_link?"], ?url)
+! https://www.baike.com/redirect_link?url=https%3A%2F%2Fgithub.com
+||baike.com/redirect_link?$urlskip=?url,doc,frame
+
+! CSDN
+csdn.net##+js(aeld, click, ".csdn.net", elements, a)
+! https://link.csdn.net/?target=https%3A%2F%2Fgreasyfork.org%2Fzh-CN%2Fscripts%2F440871-%25E9%25AA%259A%25E6%2589%25B0%25E6%258B%25A6%25E6%2588%25AA
+||link.csdn.net/?$urlskip=?target,doc,frame
+
+! 开源中国
+! https://my.oschina.net/HelloGitHub/blog/16969520
+oschina.net##+js(href-sanitizer, a[href*="GoToLink?"], ?url)
+! https://www.oschina.net/action/GoToLink?url=https%3A%2F%2Fgithub.com
+||www.oschina.net/action/GoToLink?$urlskip=?url,doc,frame
+
+! 微信开发者社区
+! https://developers.weixin.qq.com/community/develop/doc/000eea9d298c283ad3e278b3060000
+developers.weixin.qq.com##a:watch-attr(onclick):remove-attr(onclick)
+! https://developers.weixin.qq.com/community/middlepage/href?href=https%3A%2F%2Fgithub.com
+||developers.weixin.qq.com/community/middlepage/href?$urlskip=?href,doc,frame
+
+! 腾讯云开发者社区
+! https://cloud.tencent.com/developer/article/1136658
+cloud.tencent.com##+js(href-sanitizer, a[href^="/developer/tools/blog-entry?"], ?target)
+! https://cloud.tencent.com/developer/tools/blog-entry?target=https%3A%2F%2Fwww.w3.org%2FTR%2FCSS2%2F&source=article&objectId=1136658
+||cloud.tencent.com/developer/tools/blog-entry?$urlskip=?target,doc,frame
+
+! 阿里云开发者社区
+! https://developer.aliyun.com/article/295243
+developer.aliyun.com##+js(aeld, click, "data-tracker-scm", elements, a)
+! https://developer.aliyun.com/redirect?target=https%3A%2F%2Fgithub.com
+||developer.aliyun.com/redirect?$urlskip=?target,doc,frame
+
+! 站长之家
+! https://www.chinaz.com/2025/0214/1669043.shtml
+chinaz.com##+js(href-sanitizer, a[href*="www.chinaz.com/go.shtml?"], ?url)
+! https://www.chinaz.com/go.shtml?url=https://github.com
+||chinaz.com/go.shtml?$urlskip=?url,doc,frame
+
+! 51CTO博客
+! https://blog.51cto.com/u_11512826/2068421
+blog.51cto.com##+js(aeld, click, , elements, a)
+! https://blog.51cto.com/transfer?https://github.com
+||blog.51cto.com/transfer?$urlskip=^1,doc,frame
+
+
+!-------------------------娱乐-------------------------
+! Steam
+! https://steamcommunity.com/profiles/76561198973439643/recommended/3269960/
+steamcommunity.com##+js(href-sanitizer, a[href*="linkfilter/?], ?u)
+steamcommunity.com##+js(href-sanitizer, a[href*="linkfilter/?], ?url)
+! https://steamcommunity.com/linkfilter/?url=https://github.com
+||steamcommunity.com/linkfilter/?$urlskip=?url,doc,frame
+||steamcommunity.com/linkfilter/?$urlskip=?u,doc,frame
+
+! Epic
+! https://redirect.epicgames.com/en/?redirectTo=https://github.com
+||redirect.epicgames.com/*?$urlskip=?redirectTo,doc,frame
+
+! CurseForge
+! https://www.curseforge.com/linkout?remoteUrl=https%3A%2F%2Fgithub.com
+||curseforge.com/linkout?$urlskip=?remoteUrl,doc,frame
+
+
+!-------------------------职业-------------------------
+! 力扣
+! https://leetcode.cn/discuss/post/691455/zai-ni-de-githubshang-zhan-shi-leetcodes-fdcu/
+leetcode.cn##+js(href-sanitizer, a[href^="/link/?"], ?target)
+! https://leetcode.cn/link/?target=https%3A%2F%2Fgithub.com
+||leetcode.cn/link/?$urlskip=?target,doc,frame
+
+! 领英
+! https://www.linkedin.com/pulse/13-how-create-website-via-github-richard-saunders-ii
+linkedin.com##+js(href-sanitizer, a[href*="linkedin.com/redir/redirect?"], ?url)
+! https://www.linkedin.com/redir/redirect?url=https%3A%2F%2Fgithub%2Ecom%2Fdaattali%2Fbeautiful-jekyll%23readme&urlhash=xZxc&trk=article-ssr-frontend-pulse_little-text-block
+||linkedin.com/redir/redirect?url=https%3A%2F%2Fgithub%2Ecom
+
+! Workable
+! https://workable.com/nr?l=https%3A%2F%2Fzapier.com
+||workable.com/nr?$urlskip=?l,doc,frame
+
+! 牛客网
+! https://www.nowcoder.com/discuss/505853315813515264
+nowcoder.com##+js(href-sanitizer, a[href*="jump/link?"], ?link)
+! https://hd.nowcoder.com/link.html?target=https%3A%2F%2Fgithub.com
+||nowcoder.com/link.html?$urlskip=?target,doc,frame
+
+
+!-------------------------生活-------------------------
+
+
+
+!-------------------------电商-------------------------

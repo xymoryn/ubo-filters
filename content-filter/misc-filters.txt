@@ -1,0 +1,18 @@
+[uBlock Origin]
+! Title: Miscellaneous Filter
+! Author: xymoryn
+! Version: 2025.04.17
+! Last modified: 2025-04-17
+! Homepage: https://github.com/xymoryn/uBO-filters
+! License: AGPL-3.0
+! Expires: 1 days
+
+! Pixiv
+! 标签含有超过 4 个 / 的小说
+pixiv.net##[data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/):upward(li)
+
+! Firefox AMO Review
+addons.mozilla.org##.Card-contents li:has(a:has-text("退出"))
+addons.mozilla.org##.Card-contents li:has(a:has-text("平安"))
+addons.mozilla.org##.Card-contents li:has(a:has-text("邪教"))
+addons.mozilla.org##.Card-contents li:has(a:has-text("大法"))

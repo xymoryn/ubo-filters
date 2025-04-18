@@ -11,6 +11,14 @@
 ! 标签含有超过 4 个 / 的小说
 pixiv.net##[data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/):upward(li)
 
+! Greasy Fork
+! 标题超过 40 个字符的脚本
+greasyfork.org###browse-script-list > li:has(.script-link:has-text(/.{40}/))
+greasyfork.org###browse-script-list > li:has(.script-link:has-text(/网课|刷课|答题|继续教育/))
+greasyfork.org###browse-script-list > li:has(.script-link:has-text(/网盘(直连|直链|不限|s?vip)/i))
+greasyfork.org###browse-script-list > li:has(.script-link:has-text('解析'))
+greasyfork.org###browse-script-list > li:has(.script-link:has-text(/优惠券|网购/))
+
 ! Firefox AMO Review
 addons.mozilla.org##.Card-contents li:has(a:has-text("退出"))
 addons.mozilla.org##.Card-contents li:has(a:has-text("平安"))

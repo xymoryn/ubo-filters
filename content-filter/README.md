@@ -32,7 +32,7 @@ This filter was inspired by or based on the following projects:
 - [:has-text()](https://github.com/gorhill/uBlock/wiki/Procedural-cosmetic-filters#subjecthas-textneedle)
 
 ```adblock
-pixiv.net##[data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/):upward(li)
+greasyfork.org###browse-script-list > li:has(.script-link:has-text(/.{40}/))
 
 addons.mozilla.org##.Card-contents li:has(a:has-text("{keyword}"))
 ```

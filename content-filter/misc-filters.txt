@@ -7,9 +7,6 @@
 ! License: AGPL-3.0
 ! Expires: 1 days
 
-! Pixiv
-! 标签含有超过 4 个 / 的小说
-pixiv.net##li:has([data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/))
 
 ! Greasy Fork
 ! 标题超过 40 个字符的脚本
@@ -18,6 +15,14 @@ greasyfork.org###browse-script-list > li:has(.script-link:has-text(/网课|刷�
 greasyfork.org###browse-script-list > li:has(.script-link:has-text(/网盘(直连|直链|不限|s?vip)/i))
 greasyfork.org###browse-script-list > li:has(.script-link:has-text('解析'))
 greasyfork.org###browse-script-list > li:has(.script-link:has-text(/优惠券|网购/))
+
+! Pixiv
+! 标题超过 25 字的小说
+pixiv.net##section li:has(.gtm-novel-searchpage-result-title:has-text(/.{25}/))
+! 标签含有超过 4 个 / 的小说
+pixiv.net##section li:has([data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/))
+! 标签超过 15 字的小说
+pixiv.net##section li:has([data-gtm-novel-id]:matches-attr('data-gtm-label'=/.{15}/))
 
 ! Firefox AMO Review
 addons.mozilla.org##.Card-contents li:has(a:has-text("退出"))

@@ -9,7 +9,7 @@
 
 ! Pixiv
 ! 标签含有超过 4 个 / 的小说
-pixiv.net##[data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/):upward(li)
+pixiv.net##li:has([data-gtm-novel-id]:matches-attr('data-gtm-label'=/(?:[^\/]*\/){4}/))
 
 ! Greasy Fork
 ! 标题超过 40 个字符的脚本
